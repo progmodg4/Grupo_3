@@ -1,4 +1,4 @@
-from library_sm import *
+from modulo_de_alteracao import *
 from tkinter import *
 
 
@@ -16,4 +16,5 @@ botao4 = Button(janela, text = "Busca",command = buscajanela)
 botao4.grid(column = 0, row = 9)
 
 janela.mainloop()
+  
   
