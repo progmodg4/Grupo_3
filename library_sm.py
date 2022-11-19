@@ -1,4 +1,7 @@
 import sqlite3
+from sqlite3 import Error
+from functools import partial
+import global_variables
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
@@ -7,68 +10,105 @@ import global_variables
 
 con = sqlite3.connect("supermarket.db") 
 cursor = con.cursor()
+#funções para alterar o banco de dados
+def insere_aux(num,nome,quantidade,preco):
+    try:
+        cursor.execute(f"INSERT INTO Supermercado (Numero_do_produto,Nome_do_produto,Quantidade_do_produto,Preco_do_produto) VALUES ('{num}','{nome}','{quantidade}','{preco}')") #insere as variáveis
+        con.commit() #dá commit na mudança
+        return 0
+    except Error as e:
+        print(e)
+        return 1
+    
+def insere(): #recebe o input
+    global entry  
+    global entry2 
+    global entry3 
+    global entry4 
+    nome = entry.get() #Recebe o nome pela caixa de texto
+    nome = nome.lower() #coloca o nome em letra minúscula para evitar casos como frango e Frango
+    quantidade = entry2.get() #Recebe a quantidade pela caixa de texto
+    preco = entry3.get() #Recebe o preço pela qtd de texto
+    num = entry4.get() #Recebe o número do produto
+    r = insere_aux(num,nome,quantidade,preco)
 
-def insere(): 
+def remove_aux(num):
+    sql = "DELETE FROM Supermercado WHERE Numero_do_produto = ?" #remove do banco de dados o produto com o número dado
+    try:
+        cursor.execute(sql, (num,)) 
+        con.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
+
+def remove():#recebe o input
+    global entry4
+    num = entry4.get() #recebe o número do produto para retirá-lo
+    remove_aux(num)
+    
+def atualiza_nome_aux(num,nome): #faz a alteração do nome com argumentos
+    sql = "UPDATE Supermercado SET Nome_do_produto = ? WHERE Numero_do_produto = ?" #atualiza o nome do produto do número dado
+    try:
+        cursor.execute(sql, (num,)) 
+        con.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
+
+def atualiza_nome():#recebe o input
     global entry
-    global entry2
-    global entry3
     global entry4
-    nome = entry.get()
-    nome = nome.lower()
-    quantidade = entry2.get()
-    preco = entry3.get()
-    num = entry4.get()
-    cursor.execute(f"INSERT INTO Supermercado (Numero_do_produto,Nome_do_produto,Quantidade_do_produto,Preco_do_produto) VALUES ('{num}','{nome}','{quantidade}','{preco}')")
-    con.commit()
-  
+    nome = entry.get() #Recebe o nome pela caixa de texto
+    nome = nome.lower()#coloca o nome em letra minúscula para evitar casos como frango e Frango
+    num = entry4.get() #Recebe o número do produto
+    atualiza_nome_aux(num,nome)
 
-def remove():
-    global entry4
-    num = entry4.get()
-    sql = "DELETE FROM Supermercado WHERE Numero_do_produto = ?"
-    cursor.execute(sql, (num,))
-    con.commit()
+def atualiza_qtd_aux(num,qtd): #faz a alteração da qtd com argumentos
+    sql = "UPDATE Supermercado SET Quantidade_do_produto = ? WHERE Numero_do_produto = ?" #atualiza o nome do produto do número dado
+    try:
+        cursor.execute(sql, (qtd,num,)) 
+        con.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
 
-def atualiza_nome():
-    global entry
-    global entry4
-    nome = entry.get()
-    nome = nome.lower()
-    num = entry4.get()
-    sql = "UPDATE Supermercado SET Nome_do_produto = ? WHERE Numero_do_produto = ?"
-    cursor.execute(sql, (nome,num,))
-    con.commit()
-
-def atualiza_qtd():
+def atualiza_qtd(): #recebe o input
     global entry2
     global entry4
-    qtd = entry2.get()
-    num = entry4.get()
-    sql = "UPDATE Supermercado SET Quantidade_do_produto = ? WHERE Numero_do_produto = ?"
-    cursor.execute(sql, (qtd,num,))
-    con.commit()
+    qtd = entry2.get() #Recebe a qtd pela caixa de texto
+    num = entry4.get() #Recebe o número do produto
+    atualiza_qtd_aux(num,qtd)
+
+def atualiza_preco_aux(num,preco): #faz a alteração do preço com argumentos
+    sql = "UPDATE Supermercado SET Preco_do_produto = ? WHERE Numero_do_produto = ?"
+    try:
+        cursor.execute(sql, (preco,num,))
+        con.commit()
+        return 0
+    except Error as e:
+        print(e)
+        return 1
 
 def atualiza_preco():
-    global entry3
-    global entry4
+    global entry3 #Recebe o preço pela caixa de texto
+    global entry4 #Recebe o número do produto
     preco = entry3.get()
     num = entry4.get()
-    sql = "UPDATE Supermercado SET Preco_do_produto = ? WHERE Numero_do_produto = ?"
-    cursor.execute(sql, (preco,num,))
-    con.commit()
-
-    
+    atualiza_preco_aux(num,preco)
+### Janelas abaixo são somente para melhor visualização da ferramenta
     
 def novajanela():
     global entry
     global entry2
     global entry3
     global entry4
-    global janela
-    win = Tk()
+    win = Tk() #abre uma nova janela
     win.title("insercao")
     win.geometry("250x200")
-    txt4 = Label(win,text = "Número do produto")
+    txt4 = Label(win,text = "Número do produto") #Label para identificar os novos
     txt4.grid(column = 0, row = 0)
     entry4 = Entry(win,width = 40)
     entry4.focus_set()
@@ -91,14 +131,14 @@ def novajanela():
     btn = Button(win,text = "inserir", command = partial(insere))
     btn.grid(column=0,row = 24)
 
-def updatejanela():
+def updatejanela(): #abre janela pra input
     global entry
     global entry2
     global entry3
     global entry4
     global janela
-    num = entry4.get()
-    win = Tk()
+    num = entry4.get() 
+    win = Tk() 
     win.title("Atualização")
     win.geometry("250x200")
     txt = Label(win,text = "Nome")
@@ -123,9 +163,8 @@ def updatejanela():
     btn_preco = Button(win,text = "Atualiza preço", command = partial(atualiza_preco))
     btn_preco.grid(column=0,row = 24)
     
-def retirarjanela():
+def retirarjanela(): #abre janela pra input
     global entry4
-    global janela
     win = Tk()
     win.title("Remoção")
     win.geometry("250x200")
@@ -150,7 +189,8 @@ def atualizajanela():
     entry4.grid(column=0,row = 3)
     btnok = Button(win, text= "OK",command = updatejanela)
     btnok.grid(column = 0, row = 6)
-
+### a partir daqui não precisa ser testado
+    
 def printa_row():
     global entry4
     global janela
@@ -203,4 +243,5 @@ def buscajanela():
     entry.grid(column = 0, row = 12)
     btn_name = Button(win,text = "Buscar por nome", command = partial(printa_row2))
     btn_name.grid(column=0,row = 15)
+    
     
