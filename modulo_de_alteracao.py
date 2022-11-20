@@ -8,7 +8,7 @@ from tkinter import messagebox
 from functools import partial
 import global_variables
 
-con = sqlite3.connect("supermarket.db") 
+con = sqlite3.connect(r"C:\Users\Usuario\Grupo_3\supermarket.db") 
 cursor = con.cursor()
 #funções para alterar o banco de dados
 def insere_aux(num,nome,quantidade,preco):
@@ -16,7 +16,8 @@ def insere_aux(num,nome,quantidade,preco):
         cursor.execute(f"INSERT INTO Supermercado (Numero_do_produto,Nome_do_produto,Quantidade_do_produto,Preco_do_produto) VALUES ('{num}','{nome}','{quantidade}','{preco}')") #insere as variáveis
         con.commit() #dá commit na mudança
         return 0
-    except:
+    except Error as e:
+        print(e)
         return 1
     
 def insere(): #recebe o input
