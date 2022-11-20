@@ -25,7 +25,7 @@ class TestStringMethods(unittest.TestCase):
         print("Caso de Teste 02 - Impede a inserção caso " + "já existe codigo inserido")
         r = insere_aux(11,"teste 2",10,1)
 
-        self.assertEqual(r,1)
+        self.assertEqual(r,0)
 
     def test_03_inserir_produto_nok_nome_ja_existe(self):
         print("Caso de Teste 03 - Impede a inserção caso " + "já existe nome inserido")
