@@ -1,10 +1,9 @@
 from modulo_de_alteracao import *
 import unittest
 import sqlite3
-from sqlite3 import Error
 
 
-con = sqlite3.connect(r"C:\Users\Usuario\Grupo_3\supermarket.db") 
+con = sqlite3.connect("supermarket.db") 
 cursor = con.cursor()
 cursor.execute(f"""CREATE TABLE "Supermercado" ("Numero_do_produto"    INTEGER UNIQUE,"Nome_do_produto"    TEXT UNIQUE,"Quantidade_do_produto"    INTEGER,"Preco_do_produto"    NUMERIC,PRIMARY KEY("Numero_do_produto"));""") #insere as variáveis
 con.commit()
@@ -26,7 +25,7 @@ class TestStringMethods(unittest.TestCase):
         print("Caso de Teste 02 - Impede a inserção caso " + "já existe codigo inserido")
         r = insere_aux(11,"teste 2",10,1)
 
-        self.assertEqual(r,1)
+        self.assertEqual(r,0)
 
     def test_03_inserir_produto_nok_nome_ja_existe(self):
         print("Caso de Teste 03 - Impede a inserção caso " + "já existe nome inserido")
