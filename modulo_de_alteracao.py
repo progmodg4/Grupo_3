@@ -6,30 +6,13 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from functools import partial
+from login_gp1 import *
+from busca_gp4 import *
 import global_variables
 
 con = sqlite3.connect("supermarket.db") 
 cursor = con.cursor()
 #funções para alterar o banco de dados
-def busca_nome(nome, BancoDados):
-    cursor = con.cursor()
-    cursor.execute('SELECT * FROM ' + BancoDados + ' WHERE Nome_do_produto =?', (nome,))
-    #faz a busca em sql
-    
-    rows = cursor.fetchall()
-    #pega o resultado do select
-
-    return rows
-
-def busca_numero(numero, BancoDados):
-    cursor = con.cursor()
-    cursor.execute('SELECT * FROM ' + BancoDados + ' WHERE Numero_do_produto =?', (numero,))
-    #faz a busca em sql
-    
-    rows = cursor.fetchall()
-    #pega o resultado do select
-
-    return rows
 
 def insere_aux(num,nome,quantidade,preco):
     try:
@@ -175,7 +158,7 @@ def novajanela():
     global entry4
     win = Tk() #abre uma nova janela
     win.title("insercao")
-    win.geometry("300x500") 
+    win.geometry("250x200")
     txt4 = Label(win,text = "Número do produto") #Label para identificar os novos
     txt4.grid(column = 0, row = 0)
     entry4 = Entry(win,width = 40)
@@ -208,7 +191,7 @@ def updatejanela(): #abre janela pra input
     num = entry4.get() 
     win = Tk() 
     win.title("Atualização")
-    win.geometry("300x250")
+    win.geometry("250x200")
     txt = Label(win,text = "Nome")
     txt.grid(column = 0, row = 0)
     entry = Entry(win,width = 40)
@@ -235,7 +218,7 @@ def retirarjanela(): #abre janela pra input
     global entry4
     win = Tk()
     win.title("Remoção")
-    win.geometry("300x250")
+    win.geometry("250x200")
     txt = Label(win,text = "Insira o número do produto que deseja remover")
     txt.grid(column = 0, row = 0)
     entry4 = Entry(win,width = 40)
@@ -249,7 +232,7 @@ def atualizajanela():
     global janela
     win = Tk()
     win.title("Atualiza")
-    win.geometry("300x250")
+    win.geometry("250x200")
     txt = Label(win,text = "Insira o número do produto que deseja atualizar")
     txt.grid(column = 0, row = 0)
     entry4 = Entry(win,width = 40)
@@ -257,6 +240,13 @@ def atualizajanela():
     entry4.grid(column=0,row = 3)
     btnok = Button(win, text= "OK",command = updatejanela)
     btnok.grid(column = 0, row = 6)
+### a partir daqui não precisa ser testado
+
+def busca_num(num, BancoDados):
+    cursor.execute('SELECT * FROM ' + BancoDados + ' WHERE Numero_do_produto =?', (num,))
+    rows = cursor.fetchall()
+    for row in rows:
+        return row
 ### a partir daqui não precisa ser testado
     
 def printa_row():
@@ -309,3 +299,58 @@ def buscajanela():
     entry.grid(column = 0, row = 12)
     btn_name = Button(win,text = "Buscar por nome", command = partial(printa_row2))
     btn_name.grid(column=0,row = 15)
+    
+def menu():
+    janela = Tk()
+    janela.title("Stockdata")
+    texto_orientacao = Label(janela, text = "Botão inserir:Insere um novo produto no banco de dados\nBotão remover:Retira produto do banco de dados\nBotão alterar:Escolha um produto e insira qualquer alteração em seu estoque\nBotão busca:procura um produto\n")
+    texto_orientacao.grid(column = 0, row = 0)
+    botao1 = Button(janela, text = "Inserir", command = novajanela)
+    botao1.grid(column = 0, row = 3)
+    botao2 = Button(janela, text = "Retirar", command = retirarjanela)
+    botao2.grid(column = 0, row = 5)
+    botao3 = Button(janela, text = "Alterar",command = atualizajanela)  
+    botao3.grid(column = 0, row = 7)
+    botao4 = Button(janela, text = "Busca",command = buscajanela)
+    botao4.grid(column = 0, row = 9)
+
+def janela_login():
+    global entry5
+    global entry6
+    janela = Tk()
+    janela.title("Login")
+    texto_user = Label(janela, text = "Usuário:")
+    texto_user.grid(column = 0, row = 0)
+    entry5 = Entry(janela,width = 40)
+    entry5.focus_set()
+    entry5.grid(column = 0, row = 3)
+    texto_senha = Label(janela, text = "Senha:")
+    texto_senha.grid(column = 0, row = 6)
+    entry6 = Entry(janela,width = 40)
+    entry6.focus_set()
+    entry6.grid(column = 0, row = 9)
+    botao1 = Button(janela, text = "Inserir", command = verifica_aux)
+    botao1.grid(column = 0, row = 12)
+    botao_cadastro = Button(janela, text = "Cadastrar", command = cadastro_login_aux)
+    botao_cadastro.grid(column = 0, row = 15)
+
+  
+
+def verifica_aux():
+    global entry5
+    global entry6
+    user = entry5.get()
+    password = entry6.get()
+    result = verifica_login(user,password)
+    if(result['status'] == 'success'):
+        menu()
+        return print("sucesso")
+    else:
+        return print("falha")
+
+def cadastro_login_aux():
+    global entry5
+    global entry6
+    user = entry5.get()
+    password = entry6.get()
+    cadastro_login(user,password)
