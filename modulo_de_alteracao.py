@@ -8,16 +8,40 @@ from tkinter import messagebox
 from functools import partial
 import global_variables
 
-con = sqlite3.connect(r"supermarket.db") 
+con = sqlite3.connect("supermarket.db") 
 cursor = con.cursor()
 #funções para alterar o banco de dados
+def busca_nome(nome, BancoDados):
+    cursor = con.cursor()
+    cursor.execute('SELECT * FROM ' + BancoDados + ' WHERE Nome_do_produto =?', (nome,))
+    #faz a busca em sql
+    
+    rows = cursor.fetchall()
+    #pega o resultado do select
+
+    return rows
+
+def busca_numero(numero, BancoDados):
+    cursor = con.cursor()
+    cursor.execute('SELECT * FROM ' + BancoDados + ' WHERE Numero_do_produto =?', (numero,))
+    #faz a busca em sql
+    
+    rows = cursor.fetchall()
+    #pega o resultado do select
+
+    return rows
+
 def insere_aux(num,nome,quantidade,preco):
     try:
         cursor.execute(f"INSERT INTO Supermercado (Numero_do_produto,Nome_do_produto,Quantidade_do_produto,Preco_do_produto) VALUES ('{num}','{nome}','{quantidade}','{preco}')") #insere as variáveis
         con.commit() #dá commit na mudança
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto inserido")
+        txt.grid(column = 0, row = 0)
         return 0
-    except Error as e:
-        print(e)
+    except:
         return 1
     
 def insere(): #recebe o input
@@ -33,10 +57,22 @@ def insere(): #recebe o input
     r = insere_aux(num,nome,quantidade,preco)
 
 def remove_aux(num):
+    if(busca_numero(num,"Supermercado")==[]):
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto não encontrado")
+        txt.grid(column = 0, row = 0)
+        return 1
     sql = "DELETE FROM Supermercado WHERE Numero_do_produto = ?" #remove do banco de dados o produto com o número dado
     try:
         cursor.execute(sql, (num,)) 
         con.commit()
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto excluido")
+        txt.grid(column = 0, row = 0)
         return 0
     except:
         return 1
@@ -47,10 +83,22 @@ def remove():#recebe o input
     remove_aux(num)
     
 def atualiza_nome_aux(num,nome): #faz a alteração do nome com argumentos
+    if(busca_numero(num,"Supermercado")==[]):
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto não encontrado")
+        txt.grid(column = 0, row = 0)
+        return 1
     sql = "UPDATE Supermercado SET Nome_do_produto = ? WHERE Numero_do_produto = ?" #atualiza o nome do produto do número dado
     try:
         cursor.execute(sql, (nome,num,)) 
         con.commit()
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto atualizado")
+        txt.grid(column = 0, row = 0)
         return 0
     except:
         return 1
@@ -64,10 +112,22 @@ def atualiza_nome():#recebe o input
     atualiza_nome_aux(num,nome)
 
 def atualiza_qtd_aux(num,qtd): #faz a alteração da qtd com argumentos
+    if(busca_numero(num,"Supermercado")==[]):
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto não encontrado")
+        txt.grid(column = 0, row = 0)
+        return 1
     sql = "UPDATE Supermercado SET Quantidade_do_produto = ? WHERE Numero_do_produto = ?" #atualiza o nome do produto do número dado
     try:
         cursor.execute(sql, (qtd,num,)) 
         con.commit()
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto atualizado")
+        txt.grid(column = 0, row = 0)
         return 0
     except:
         return 1
@@ -80,10 +140,22 @@ def atualiza_qtd(): #recebe o input
     atualiza_qtd_aux(num,qtd)
 
 def atualiza_preco_aux(num,preco): #faz a alteração do preço com argumentos
+    if(busca_numero(num,"Supermercado")==[]):
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto não encontrado")
+        txt.grid(column = 0, row = 0)
+        return 1
     sql = "UPDATE Supermercado SET Preco_do_produto = ? WHERE Numero_do_produto = ?"
     try:
         cursor.execute(sql, (preco,num,))
         con.commit()
+        janela = Tk()
+        janela.title("Stockdata")
+        janela.geometry("180x60") 
+        txt = Label(janela,text = "Produto atualizado")
+        txt.grid(column = 0, row = 0)
         return 0
     except:
         return 1
@@ -103,7 +175,7 @@ def novajanela():
     global entry4
     win = Tk() #abre uma nova janela
     win.title("insercao")
-    win.geometry("250x200")
+    win.geometry("300x500") 
     txt4 = Label(win,text = "Número do produto") #Label para identificar os novos
     txt4.grid(column = 0, row = 0)
     entry4 = Entry(win,width = 40)
@@ -136,7 +208,7 @@ def updatejanela(): #abre janela pra input
     num = entry4.get() 
     win = Tk() 
     win.title("Atualização")
-    win.geometry("250x200")
+    win.geometry("300x250")
     txt = Label(win,text = "Nome")
     txt.grid(column = 0, row = 0)
     entry = Entry(win,width = 40)
@@ -163,7 +235,7 @@ def retirarjanela(): #abre janela pra input
     global entry4
     win = Tk()
     win.title("Remoção")
-    win.geometry("250x200")
+    win.geometry("300x250")
     txt = Label(win,text = "Insira o número do produto que deseja remover")
     txt.grid(column = 0, row = 0)
     entry4 = Entry(win,width = 40)
@@ -177,7 +249,7 @@ def atualizajanela():
     global janela
     win = Tk()
     win.title("Atualiza")
-    win.geometry("250x200")
+    win.geometry("300x250")
     txt = Label(win,text = "Insira o número do produto que deseja atualizar")
     txt.grid(column = 0, row = 0)
     entry4 = Entry(win,width = 40)
@@ -191,12 +263,11 @@ def printa_row():
     global entry4
     global janela
     num = entry4.get()
-    sql = "SELECT * FROM Supermercado WHERE Numero_do_produto = ?"
-    desejado = cursor.execute(sql,(num,))
+    desejado = busca_numero(num, "Supermercado")
     win = Tk()
     win.title("Produto")
     win.geometry("250x60")
-    i = 0
+    i = 1
     for Supermercado in desejado:
         for j in range(len(Supermercado)):
             e = Label(win,width = 200,fg = 'blue',text = Supermercado,anchor = 'w')
@@ -207,8 +278,7 @@ def printa_row2():
     global janela
     nome = entry.get()
     nome = nome.lower()
-    sql = "SELECT * FROM Supermercado WHERE Nome_do_produto = ?"
-    desejado = cursor.execute(sql,(nome,))
+    desejado = busca_nome(nome, "Supermercado")
     win = Tk()
     win.title("Produto")
     win.geometry("250x60")
